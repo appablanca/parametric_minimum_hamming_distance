@@ -1,26 +1,26 @@
 # Parameterized Minimum Hamming Distance
 
-This project implements a parameterized algorithm for the **Minimum Maximum Hamming Distance** problem.
+This project implements a parameterized algorithm for the **Closest String / Minimum Maximum Hamming Distance** problem.
 
-Given a set of strings of equal length, the goal is to find a string $begin:math:text$ s $end:math:text$ that minimizes the maximum Hamming distance to all input strings.
+Given a set of strings of equal length, the goal is to find a string that minimizes the maximum Hamming distance to all input strings.
 
 ---
 
 ## Problem Definition
 
-Given strings
+Given a set of strings
 
-$begin:math:display$
-S \= \\\{s\_1\, s\_2\, \\dots\, s\_n\\\}
-$end:math:display$
+```text
+S = {s1, s2, ..., sn}
+```
 
-find a string $begin:math:text$ x $end:math:text$ such that
+find a string `x` such that
 
-$begin:math:display$
-\\max\_i d\_H\(x\,s\_i\)
-$end:math:display$
+```text
+max dH(x, si)
+```
 
-is minimized, where $begin:math:text$ d\_H $end:math:text$ denotes the Hamming distance.
+is minimized, where `dH` denotes the Hamming distance.
 
 The program outputs a candidate string whose maximum Hamming distance to all input strings is as small as possible.
 
@@ -41,7 +41,7 @@ abcdd
 abcdf
 ```
 
-- First line: number of strings $begin:math:text$ n $end:math:text$
+- First line: number of strings (`n`)
 - Remaining lines: strings of equal length
 
 ---
@@ -64,7 +64,7 @@ Run the solver on an instance:
 ./solver strings/string0.in
 ```
 
-The program performs a binary search on the optimal value $begin:math:text$ k $end:math:text$.
+The program performs a binary search on the optimal value `k`.
 
 Example output:
 
@@ -76,13 +76,7 @@ Trying k = 4
 Best k found: 4
 ```
 
-A solution file is generated automatically:
-
-```text
-solutionstrings/string0.in
-```
-
-(or generally `solution<instance-name>`).
+A solution file is generated automatically.
 
 ---
 
@@ -95,7 +89,7 @@ The optimal maximum Hamming distance is searched using binary search.
 - Lower bound: `0`
 - Upper bound: maximum distance from the first input string to any other input string
 
-For a candidate value $begin:math:text$ k $end:math:text$, the algorithm checks feasibility.
+For a candidate value `k`, the algorithm checks feasibility.
 
 ---
 
@@ -105,27 +99,27 @@ The first input string is used as the initial **holy string**.
 
 The recursive branching procedure works as follows:
 
-1. Find a string whose Hamming distance to the current candidate exceeds $begin:math:text$ k $end:math:text$.
+1. Find a string whose Hamming distance to the current candidate exceeds `k`.
 2. If no such string exists, a valid solution has been found.
-3. Otherwise, choose one differing position.
-4. Change the candidate string at that position to match the violating string.
-5. Recurse.
+3. Otherwise, determine the positions where the candidate and the violating string differ.
+4. Branch on these positions by changing one character at a time to match the violating string.
+5. Recursively continue the search.
 
-The search depth is bounded by $begin:math:text$ k $end:math:text$.
+The search depth is bounded by `k`.
 
 A pruning rule is used:
 
 ```cpp
-if (d - depthLeft > k)
+if (distance - depthLeft > k)
     return false;
 ```
 
-where
+where:
 
-- `d` is the distance to the violating string,
+- `distance` is the Hamming distance to the violating string.
 - `depthLeft` is the remaining number of allowed modifications.
 
-If even changing all remaining positions cannot reduce the distance below $begin:math:text$ k $end:math:text$, the branch is discarded.
+If even changing all remaining positions cannot reduce the distance below `k`, the branch is discarded.
 
 ---
 
@@ -153,7 +147,7 @@ If even changing all remaining positions cannot reduce the distance below $begin
 
 ## Validation
 
-The provided validator can be used to evaluate a produced solution:
+Validate a generated solution using:
 
 ```bash
 python3 validator.py strings/string0.in solutions/solutionstring0.in
@@ -165,30 +159,30 @@ The validator reports the maximum Hamming distance of the candidate string to th
 
 ## Complexity
 
-Let
+Let:
 
-- $begin:math:text$ n $end:math:text$ = number of strings,
-- $begin:math:text$ m $end:math:text$ = string length,
-- $begin:math:text$ k $end:math:text$ = optimal maximum Hamming distance.
+- `n` = number of strings
+- `m` = string length
+- `k` = optimal maximum Hamming distance
 
-The feasibility procedure branches on differing positions and has worst-case complexity
+The feasibility procedure branches on differing positions and has worst-case complexity:
 
-$begin:math:display$
-O\(m\^k\)
-$end:math:display$
+```text
+O(m^k)
+```
 
-while each validation step requires
+Each validation step requires:
 
-$begin:math:display$
-O\(nm\)\.
-$end:math:display$
+```text
+O(nm)
+```
 
-Binary search introduces an additional factor of
+Binary search adds an additional factor:
 
-$begin:math:display$
-O\(\\log m\)\.
-$end:math:display$
+```text
+O(log m)
+```
 
-Thus the algorithm is fixed-parameter tractable with respect to $begin:math:text$ k $end:math:text$.
+Therefore, the algorithm is **fixed-parameter tractable (FPT)** with respect to `k`.
 
 ---
